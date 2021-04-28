@@ -10,7 +10,7 @@ keytool -exportcert -alias yourkeystorealias -keystore path/to/your/keystore/fil
 If you aren't using AzureADMyOrg as one of your authorities, you can omit TENANT_ID, and if you're only building for iOS, you can omit KEY_HASH, but you really need to provide CLIENT_ID.
 ### If you're using a CLI:
 <pre>
-cordova plugin add cordova-plugin-msal --variable TENANT_ID=your-tenant-guid-here --variable CLIENT_ID=your-client-guid-here --variable KEY_HASH=S0m3K3yh4shH3re=
+cordova plugin add https://github.com/inPact/cordova-plugin-msal --variable TENANT_ID=your-tenant-guid-here --variable CLIENT_ID=your-client-guid-here --variable KEY_HASH=S0m3K3yh4shH3re=
 </pre>
 ### If you're using OutSystems
 You should use my [forge component](https://www.outsystems.com/forge/Component_Overview.aspx?ProjectId=8038). But if you want to implement a wrapper yourself, or if you're here because you're using that component and you want additional documentation, continue reading:
@@ -119,14 +119,20 @@ window.cordova.plugins.msalPlugin.signInSilent(
 ```
 If you don't have an account, then either prompt immediately to sign in interactively (see below) or, if your app has guest access, do nothing and show your user an interface with options for signing in or continuing as a guest, wait for them to pick one. (Or don't do either. This plugin won't do you any good but it's your app.) If they choose to sign in, then start that flow with:
 ```js
+var MsalAccessToken;
+var MsalIdToken;
+var MsalAccount;
+
 window.cordova.plugins.msalPlugin.signInInteractive(
-    function(resp) {
-        // resp is an object containing information about the signed in user, see below.
+    function(response) {
+        // Success
+        MsalAccessToken = response.token;
+        MsalIdToken = response.idToken;
+        MsalAccount = response.account;
     }, 
-    function(err) {
-        // Usually if we get an error it just means the user cancelled the
-        // signin process and closed the popup window. Handle this however
-        // you want, depending again if you want guest access or not.
+    function(error) {
+        // Error
+        console.log(error);
     }
 );
 ```
@@ -147,7 +153,8 @@ window.cordova.plugins.msalPlugin.signOut(
 The object returned by signInInteractive() and signInSilent() will look something like this:
 ```js
 {
-    token: 'eyJ0eXAiOiJKV1QiLCJub...',
+    accessToken: 'eyJ0eXAiOiJKV1QiLCJub...',
+    idToken: 'eyJ0eXAiOiJKV1QiLCJhbGc...',
     account: {
         id: 'abc-someguid-123',
         username: 'wrobins@myemailaddr.com',
