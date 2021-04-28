@@ -126,7 +126,7 @@ var MsalAccount;
 window.cordova.plugins.msalPlugin.signInInteractive(
     function(response) {
         // Success
-        MsalAccessToken = response.token;
+        MsalAccessToken = response.accessToken;
         MsalIdToken = response.idToken;
         MsalAccount = response.account;
     }, 
